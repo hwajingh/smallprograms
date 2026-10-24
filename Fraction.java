@@ -39,13 +39,18 @@ import java.util.Scanner;
 
         }
 
-        public static long gcm(long num, long den) {
-            return den == 0 ? num : gcm(den, num % den);
+        // FIX: renamed gcm -> gcd (it computes a greatest common divisor),
+        // and asFraction now guards den == 0 instead of dividing by zero.
+        public static long gcd(long num, long den) {
+            return den == 0 ? num : gcd(den, num % den);
         }
 
         public static String asFraction(long num, long den) {
-            long gcm = gcm(num, den);
-            return (num / gcm) + "/" + (den / gcm);
+            if (den == 0) {
+                throw new IllegalArgumentException("Denominator cannot be zero");
+            }
+            long gcd = gcd(num, den);
+            return (num / gcd) + "/" + (den / gcd);
         }
 
 
@@ -70,12 +75,9 @@ import java.util.Scanner;
 
             System.exit(0);}
 
-            while (make.num != 0 && make.den != 0){
-                if(make.num > make.den)
-                    make.num = make.num % make.den;
-                else
-                    make.den = make.den %make.num;
-            }
+            // FIX: deleted the dead Euclid loop here — it mutated
+            // make.num/make.den and its result was thrown away, since
+            // the lines below print asFraction(500, 1000) etc. directly.
 
             System.out.print("\n Output :\n");
             System.out.println(asFraction(500, 1000)); //  "1/2"
