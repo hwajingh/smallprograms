@@ -42,41 +42,52 @@ public class Pizza {
         this.pepcount= pepcount;
     }
 
-     public int calCost(int size, int cheesecount, int hamcount, int pepcount )
-    {
+    // FIX: single source of truth for the size -> base price table.
+    // Previously calCost() and getDescription() each re-derived it.
+    public static int basePrice(int size) {
         if (size == 1) {
-            return (10+(cheesecount*2)+(hamcount*2)+(pepcount*2));
+            return 10;
         } else if (size == 2) {
-            return (12+(cheesecount*2)+(hamcount*2)+(pepcount*2));
+            return 12;
         } else {
-            return (14+(cheesecount*2)+(hamcount*2)+(pepcount*2));
+            return 14;
         }
     }
 
-    public String getDescription(int size, int cheesecount, int hamcount, int pepcount ) {
-
-        String sizeofpizza = "nothing";
-        int priceofpizza = 0;
-
+    public static String sizeName(int size) {
         if (size == 1) {
-            sizeofpizza = "small";
-            priceofpizza = 10;
+            return "small";
         } else if (size == 2) {
-            sizeofpizza = "medium";
-            priceofpizza = 12;
-
+            return "medium";
         } else {
-            sizeofpizza = "large";
-            priceofpizza = 14;
-
+            return "large";
         }
+    }
 
+    // Kept with its original signature for compatibility; it now uses
+    // the object's fields when the caller passes them, via basePrice().
+    // Prefer the no-arg calCost() below for new code.
+    public int calCost(int size, int cheesecount, int hamcount, int pepcount)
+    {
+        return basePrice(size) + (cheesecount * 2) + (hamcount * 2) + (pepcount * 2);
+    }
 
-        return  "Pizza " +
-                "is " + sizeofpizza +
+    public int calCost() {
+        return calCost(this.size, this.cheesecount, this.hamcount, this.pepcount);
+    }
+
+    public String getDescription(int size, int cheesecount, int hamcount, int pepcount) {
+        // FIX: previously priceofpizza was computed and never used, and
+        // the size table was duplicated here. Now both come from helpers.
+        return "Pizza " +
+                "is " + sizeName(size) +
                 " with " + cheesecount + " cheese, " +
                 +pepcount + " pepperoni and " +
                 +hamcount + " ham should cost " + calCost(size, cheesecount, hamcount, pepcount) + " dollars";
+    }
+
+    public String getDescription() {
+        return getDescription(this.size, this.cheesecount, this.hamcount, this.pepcount);
     }
 
 
