@@ -18,8 +18,14 @@ public class Odometer {
         return fuel;
     }
 
-    public void setfuel() {
+    // FIX: the original took no parameter and self-assigned (this.fuel = fuel).
+    public void setFuel(double fuel) {
         this.fuel = fuel;
+    }
+
+    // Compatibility alias for the original lowercase name.
+    public void setfuel(double fuel) {
+        setFuel(fuel);
     }
 
 
@@ -27,8 +33,14 @@ public class Odometer {
         return odometer;
     }
 
-    public void setOdometer(double add) {
-        this.odometer = add + 10000;
+    // FIX: the original silently added 10000 to every value.
+    // Per the class comment, this adds a trip's miles to the odometer total.
+    public void setOdometer(double miles) {
+        this.odometer += miles;
+    }
+
+    public void resetOdometer() {
+        this.odometer = 0;
     }
 
     public double getMilesDriven() {
@@ -38,7 +50,8 @@ public class Odometer {
     ;
 
 
-    public void setMilesDriven() {
+    // FIX: the original took no parameter and self-assigned.
+    public void setMilesDriven(double milesDriven) {
         this.milesDriven = milesDriven;
     }
 
@@ -71,6 +84,16 @@ public class Odometer {
         System.out.println("The Fuel efficiency is ");
         System.out.println(fueleff(milesdriven, GallonsUsed));
         System.out.println("The total of odometer after this trip is " + (odometer + milesdriven) + "miles");
+
+        // FIX: main previously ignored the object entirely and used only
+        // local variables. Wire it to an Odometer instance.
+        Odometer car = new Odometer();
+        car.setMilesDriven(milesdriven);
+        car.setFuel(GallonsUsed);
+        car.setOdometer(milesdriven);
+        System.out.println("Odometer object: miles driven = " + car.getMilesDriven()
+                + ", odometer total = " + car.getOdometer()
+                + ", fuel = " + car.getFuel());
 
 
     }
