@@ -1,12 +1,15 @@
 import java.util.Comparator;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Queue;
 
+// NOTE: this class intentionally keeps its original name and API
+// (enqueue / dequeue, highest value first), but the storage is now
+// java.util.PriorityQueue (fully qualified below, because this class
+// shadows the JDK name). The original sorted the whole list on every
+// insert (O(n log n) per insert) and removed index 0 (O(n) shift),
+// and its ArrayList was static, so all instances shared one queue.
 public class PriorityQueue {
 
-    static ArrayList<Pair> pq;
-
-    class Pair {
+    static class Pair {
         String key;
         int value;
 
@@ -20,25 +23,26 @@ public class PriorityQueue {
         }
     }
 
-    static class itemComparator implements Comparator<Pair>
-    {
-        public int compare(Pair c1, Pair c2)
-        {
-            return c2.getValue() - c1.getValue();
-        }
-    }
+    // Instance field, not static: instances no longer share a queue.
+    private final Queue<Pair> pq;
 
     public PriorityQueue() {
-        pq = new ArrayList<>();
+        // JDK PriorityQueue is a min-heap by default; reverse the
+        // comparator so dequeue() returns the highest value first,
+        // matching the original descending sort.
+        this.pq = new java.util.PriorityQueue<>(
+                Comparator.comparingInt(Pair::getValue).reversed());
     }
 
+    // O(log n) insert, instead of O(n log n) sort-on-every-insert.
     public void enqueue(String key, int value) {
         pq.add(new Pair(key, value));
-        Collections.sort(pq, new itemComparator());
     }
 
+    // O(log n) removal, instead of O(n) remove(0) shift.
     public String dequeue() {
-        return pq.remove(0).key;
+        Pair pair = pq.poll();
+        return pair == null ? null : pair.key;
     }
 
     public static void main(String[] args) {
@@ -49,15 +53,3 @@ public class PriorityQueue {
         System.out.print(pq.dequeue());
     }
 }
-
-//public class test {
-//    static PriorityQueue pq;
-//
-//    public static void main(String[] args) {
-//        pq = new PriorityQueue();
-//        pq.enqueue("X", 10);
-//        pq.enqueue("Y", 1);
-//        pq.enqueue("Z", 3);
-//        System.out.print(pq.dequeue());
-//    }
-//}
