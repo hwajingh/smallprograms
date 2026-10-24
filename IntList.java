@@ -6,23 +6,27 @@ import java.util.Collections;
 
 public class IntList {
 
-    static int[] list;
-    static HashMap<Integer, Integer> numberCount;
-    static int index = 0;
+    // FIX: the original used a fixed int[50] (51st addNum threw
+    // ArrayIndexOutOfBoundsException) and static fields, so instances
+    // shared state. Now instance fields, unbounded.
+    private final List<Integer> list;
+    private final HashMap<Integer, Integer> numberCount;
 
     public IntList() {
-        list = new int[50];
+        list = new ArrayList<>();
         numberCount = new HashMap<>();
     }
 
     public void addNum(int num) {
-        list[index++] = num;
+        list.add(num);
         numberCount.put(num, numberCount.getOrDefault(num, 0) + 1);
     }
 
     public void outputColumns() {
         Set<Integer> keySet = numberCount.keySet();
-        List sortedList = new ArrayList(keySet);
+        // FIX: raw type -> typed list (also removes the sort-then-reverse
+        // workaround note: descending order is kept via reverse iteration).
+        List<Integer> sortedList = new ArrayList<>(keySet);
         Collections.sort(sortedList);
 
         for(int i = sortedList.size() - 1; i >= 0; i--) {
